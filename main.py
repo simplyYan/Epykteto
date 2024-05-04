@@ -9,18 +9,19 @@ class EpyktetoApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Epykteto")
-        self.root.geometry("300x100")
+        self.root.geometry("400x200")
+        self.root.config(bg="#1f1f1f")
         
-        self.label = tk.Label(root, text="Set the time (seconds):")
-        self.label.pack()
+        self.label = tk.Label(root, text="Set lock time (seconds):", fg="white", bg="#1f1f1f", font=("Arial", 12))
+        self.label.pack(pady=10)
 
-        self.entry = tk.Entry(root)
-        self.entry.pack()
+        self.entry = tk.Entry(root, bg="#1f1f1f", fg="white", font=("Arial", 12), insertbackground="white")
+        self.entry.pack(pady=5)
 
-        self.button = tk.Button(root, text="Confirmar", command=self.start_timer)
-        self.button.pack()
+        self.button = tk.Button(root, text="Confirm", command=self.start_timer, bg="#2f2f2f", fg="white", font=("Arial", 12), padx=10)
+        self.button.pack(pady=10)
 
-        self.duration = 0  # Inicialize a duração como 0 no início
+        self.duration = 0  # Initialize duration as 0 at the beginning
 
     def start_timer(self):
         try:
@@ -31,7 +32,7 @@ class EpyktetoApp:
             self.save_start_time()
             self.root.after(self.duration * 1000, self.check_time)
         except ValueError:
-            messagebox.showerror("Erro", "Por favor, insira um número válido.")
+            messagebox.showerror("Error", "Please enter a valid number.")
 
     def save_start_time(self):
         with open("start_time.txt", "w") as file:
@@ -55,8 +56,8 @@ class EpyktetoApp:
             messagebox.showinfo("Epykteto", "Time's up. Your device is no longer locked.")
 
     def block_keyboard(self, event):
-        messagebox.showinfo("Bloqueado", "You cannot use the keyboard while the device is locked.")
-        subprocess.run(["shutdown", "/l"]) 
+        messagebox.showinfo("Locked", "You can't use the keyboard while the device is locked.")
+        subprocess.run(["shutdown", "/l"])  # Execute 'shutdown /l' command to log out
 
     def check_previous_timer(self):
         start_time = self.load_start_time()
@@ -72,14 +73,15 @@ class EpyktetoApp:
             else:
                 self.root.attributes("-fullscreen", False)
                 self.root.unbind("<Key>")
-                messagebox.showinfo("Epykteto", "Previous timeout. Your device is no longer locked.")
+                messagebox.showinfo("Epykteto", "Previous time expired. Your device is no longer locked.")
+                # If previous time has expired, clear the start time file
                 self.clear_previous_timer()
 
     def clear_previous_timer(self):
         try:
             os.remove("start_time.txt")
         except FileNotFoundError:
-            pass  
+            pass  # If file doesn't exist, do nothing
 
 if __name__ == "__main__":
     root = tk.Tk()
